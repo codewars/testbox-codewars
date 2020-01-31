@@ -1,0 +1,15 @@
+{
+    "name":"testbox-codewars",
+    "version":"1.0.0",
+    "slug":"testbox-codewars",
+    "createPackgeDirectory":false,
+    "shortDescription":"Custom reporter and runner for TestBox",
+    "type":"projects",
+    "dependencies":{
+        "testbox":"^3.1.0+339"
+    },
+    "installPaths":{
+        "testbox":"testbox/"
+    },
+    "scripts":{}
+}

@@ -23,9 +23,11 @@ component {
 				}
 			}
 
+			var debugMap = prepareDebugBuffer( thisBundle.debugBuffer );
+
 			// Generate reports for each suite
 			for ( var suiteStats in thisBundle.suiteStats ) {
-				genSuiteReport( suiteStats = suiteStats, bundleStats = thisBundle, print = print );
+				genSuiteReport( suiteStats = suiteStats, bundleStats = thisBundle, print = print, debugMap = debugMap );
 			}
 		}
 	}
@@ -36,16 +38,24 @@ component {
 	 * @bundleStats Bundle stats
 	 * @print The print Buffer
 	 */
-	function genSuiteReport( required suiteStats, required bundleStats, required print ){
+	function genSuiteReport( required suiteStats, required bundleStats, required print, debugMap={}, labelPrefix='' ){
+		labelPrefix &= '/' & arguments.suiteStats.name;
 		print.line( prependLF( "<DESCRIBE::>#arguments.suiteStats.name#" ) );
 
 		for ( local.thisSpec in arguments.suiteStats.specStats ) {
+			var thisSpecLabel = labelPrefix & '/' & local.thisSpec.name;
 			print.line( prependLF( "<IT::>#local.thisSpec.name#" ) );
+
+			if( debugMap.keyExists( thisSpecLabel ) ) {
+				print.line( debugMap[ thisSpecLabel ] )
+			}
 
 			if ( local.thisSpec.status == "passed" ) {
 				print.line( prependLF( "<PASSED::>Test Passed" ) );
 			} else if ( local.thisSpec.status == "failed" ) {
 				print.line( prependLF( "<FAILED::>#escapeLF( local.thisSpec.failMessage )#" ) );
+			} else if ( local.thisSpec.status == "skipped" ) {
+				print.line( prependLF( "<LOG::>Skipped" ) );				
 			} else if ( local.thisSpec.status == "error" ) {
 				print.line( prependLF( "<ERROR::>#escapeLF( local.thisSpec.error.message )#" ) );
 
@@ -80,7 +90,7 @@ component {
 		// Handle nested Suites
 		if ( arguments.suiteStats.suiteStats.len() ) {
 			for ( local.nestedSuite in arguments.suiteStats.suiteStats ) {
-				genSuiteReport( local.nestedSuite, arguments.bundleStats, print )
+				genSuiteReport( local.nestedSuite, arguments.bundleStats, print, debugMap, labelPrefix )
 			}
 		}
 
@@ -93,6 +103,16 @@ component {
 
 	private function prependLF( required text ){
 		return "#chr( 10 )##text#";
+	}
+
+	// Transofrm array of messages to struct keyed on message label containing an array of 
+	private function prepareDebugBuffer( array debugBuffer ) {
+		return debugBuffer.reduce( ( debugMap={}, d )=> {
+			debugMap[ d.label ] = debugMap[ d.label ] ?: '';
+			debugMap[ d.label ] &= prependLF( isSimpleValue( d.data ) ? d.data : serialize( d.data ) );
+			return debugMap;
+		} ) ?: {};
+
 	}
 
 }
