@@ -2,7 +2,7 @@
     "name":"testbox-codewars",
     "version":"1.0.0",
     "slug":"testbox-codewars",
-    "createPackgeDirectory":false,
+    "createPackageDirectory":false,
     "shortDescription":"Custom reporter and runner for TestBox",
     "type":"projects",
     "dependencies":{
