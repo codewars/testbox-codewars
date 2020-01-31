@@ -55,7 +55,8 @@ component {
 			} else if ( local.thisSpec.status == "failed" ) {
 				print.line( prependLF( "<FAILED::>#escapeLF( local.thisSpec.failMessage )#" ) );
 			} else if ( local.thisSpec.status == "skipped" ) {
-				print.line( prependLF( "<LOG::>Skipped" ) );				
+				print.line( prependLF( "<LOG::>Skipped" ) );
+				print.line( prependLF( "<ERROR::>Test skipped" ) );
 			} else if ( local.thisSpec.status == "error" ) {
 				print.line( prependLF( "<ERROR::>#escapeLF( local.thisSpec.error.message )#" ) );
 
