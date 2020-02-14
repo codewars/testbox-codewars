@@ -28,7 +28,7 @@
 
 	// Set exit code to 1 on failure
 	if ( testData.totalFail || testData.totalError ) {
-		return 1;
+		createObject( 'java', 'java.lang.System' ).setProperty( 'cfml.cli.exitCode', 1 );
 	}
 
 
