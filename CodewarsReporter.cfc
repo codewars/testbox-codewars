@@ -5,21 +5,20 @@
 component {
 
 	/**
-	 * @print a print buffer to use
 	 * @testData test results from TestBox
 	 */
-	function render( print, testData ){
+	function render( testData ){
 		for ( thisBundle in testData.bundleStats ) {
 			// Check if the bundle threw a global exception
 			if ( !isSimpleValue( thisBundle.globalException ) ) {
 				var message = escapeLF(
 					"#thisBundle.globalException.type#:#thisBundle.globalException.message#:#thisBundle.globalException.detail#"
 				);
-				print.line( prependLF( "<ERROR::>#message#" ) );
+				printLine( prependLF( "<ERROR::>#message#" ) );
 
 				// ACF has an array for the stack trace
 				if ( isSimpleValue( thisBundle.globalException.stacktrace ) ) {
-					print.line( prependLF( "<LOG::-Stacktrace>#escapeLF( thisBundle.globalException.stacktrace )#" ) );
+					printLine( prependLF( "<LOG::-Stacktrace>#escapeLF( thisBundle.globalException.stacktrace )#" ) );
 				}
 			}
 
@@ -27,7 +26,7 @@ component {
 
 			// Generate reports for each suite
 			for ( var suiteStats in thisBundle.suiteStats ) {
-				genSuiteReport( suiteStats = suiteStats, bundleStats = thisBundle, print = print, debugMap = debugMap );
+				genSuiteReport( suiteStats = suiteStats, bundleStats = thisBundle, debugMap = debugMap );
 			}
 		}
 	}
@@ -36,28 +35,27 @@ component {
 	 * Recursive Output for suites
 	 * @suiteStats Suite stats
 	 * @bundleStats Bundle stats
-	 * @print The print Buffer
 	 */
-	function genSuiteReport( required suiteStats, required bundleStats, required print, debugMap={}, labelPrefix='' ){
+	function genSuiteReport( required suiteStats, required bundleStats, debugMap={}, labelPrefix='' ){
 		labelPrefix &= '/' & arguments.suiteStats.name;
-		print.line( prependLF( "<DESCRIBE::>#arguments.suiteStats.name#" ) );
+		printLine( prependLF( "<DESCRIBE::>#arguments.suiteStats.name#" ) );
 
 		for ( local.thisSpec in arguments.suiteStats.specStats ) {
 			var thisSpecLabel = labelPrefix & '/' & local.thisSpec.name;
-			print.line( prependLF( "<IT::>#local.thisSpec.name#" ) );
+			printLine( prependLF( "<IT::>#local.thisSpec.name#" ) );
 
 			if( debugMap.keyExists( thisSpecLabel ) ) {
-				print.line( debugMap[ thisSpecLabel ] )
+				printLine( debugMap[ thisSpecLabel ] )
 			}
 
 			if ( local.thisSpec.status == "passed" ) {
-				print.line( prependLF( "<PASSED::>Test Passed" ) );
+				printLine( prependLF( "<PASSED::>Test Passed" ) );
 			} else if ( local.thisSpec.status == "failed" ) {
-				print.line( prependLF( "<FAILED::>#escapeLF( local.thisSpec.failMessage )#" ) );
+				printLine( prependLF( "<FAILED::>#escapeLF( local.thisSpec.failMessage )#" ) );
 			} else if ( local.thisSpec.status == "skipped" ) {
-				print.line( prependLF( "<FAILED::>Test Skipped" ) );
+				printLine( prependLF( "<FAILED::>Test Skipped" ) );
 			} else if ( local.thisSpec.status == "error" ) {
-				print.line( prependLF( "<ERROR::>#escapeLF( local.thisSpec.error.message )#" ) );
+				printLine( prependLF( "<ERROR::>#escapeLF( local.thisSpec.error.message )#" ) );
 
 				var errorStack = [];
 				// If there's a tag context, show the file name and line number where the error occurred
@@ -78,23 +76,23 @@ component {
 							return "at #item.template#:#item.line#";
 						} )
 						.toList( "<:LF:>" );
-					print.line( prependLF( "<LOG::-Stacktrace>#stacktrace#" ) );
+					printLine( prependLF( "<LOG::-Stacktrace>#stacktrace#" ) );
 				}
 			} else {
-				print.line( prependLF( "<ERROR::>Unknown test status: #local.thisSpec.status#" ) );
+				printLine( prependLF( "<ERROR::>Unknown test status: #local.thisSpec.status#" ) );
 			}
 
-			print.line( prependLF( "<COMPLETEDIN::>#local.thisSpec.totalDuration#" ) );
+			printLine( prependLF( "<COMPLETEDIN::>#local.thisSpec.totalDuration#" ) );
 		}
 
 		// Handle nested Suites
 		if ( arguments.suiteStats.suiteStats.len() ) {
 			for ( local.nestedSuite in arguments.suiteStats.suiteStats ) {
-				genSuiteReport( local.nestedSuite, arguments.bundleStats, print, debugMap, labelPrefix )
+				genSuiteReport( local.nestedSuite, arguments.bundleStats, debugMap, labelPrefix )
 			}
 		}
 
-		print.line( prependLF( "<COMPLETEDIN::>#arguments.suiteStats.totalDuration#" ) );
+		printLine( prependLF( "<COMPLETEDIN::>#arguments.suiteStats.totalDuration#" ) );
 	}
 
 	private function escapeLF( required text ){
@@ -113,6 +111,10 @@ component {
 			return debugMap;
 		} ) ?: {};
 
+	}
+
+	private function printLine( string str ) {
+		systemoutput( str, 1 );
 	}
 
 }

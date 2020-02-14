@@ -1,7 +1,7 @@
 ## testbox-codewars
 
 - `CodewarsReporter.cfc`: Custom reporter for TestBox to produce Codewars format
-- `TestRunner.cfc`: Runs TestBox tests and produces output for Codewars
+- `TestRunner.cfm`: Runs TestBox tests and produces output for Codewars
 - `CodewarsBaseSpec.cfc`: Base tests for CFML test bundles that captures spec-level debugging output
 
 ### Usage
@@ -21,5 +21,5 @@ To test locally, create a `Solution.cfc` and `SolutionTest.cfc` in the root dir.
 Run the task runner with the following command:
 
 ```bash
-box task run TestRunner
+box -clishellpath=/path/to/TestRunner.cfm
 ```
